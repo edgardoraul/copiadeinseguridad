@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 :: Host a copiar
 set HOST=%1
 
@@ -13,6 +14,7 @@ set FECHA=%DATE:~6,4%-%DATE:~3,2%-%DATE:~0,2%
 set FECHA_ROBOCOPY=%DATE:~6,4%%DATE:~3,2%%DATE:~0,2%
 set HORA=%TIME:~0,2%:%TIME:~3,2%
 set FECHA_COMPLETA=%FECHA% %HORA%
+set HORA_INICIO=%TIME%
 set BASE=%DISCO%\%HOST%
 set TMP=%BASE%\%SHARE%
 set LOG=%BASE%\%HOST%.log
@@ -20,23 +22,27 @@ set LOG=%BASE%\%HOST%.log
 :: Controla si existe la carpeta base
 if not exist "%BASE%" mkdir "%BASE%"
 
+:: Crear nombre único para archivo de control (uno por cada SHARE)
+set SHARE_SAFE=%SHARE:\=_%
+set LASTBACKUP_FILE=%BASE%\.last_full_backup_%SHARE_SAFE%.txt
+
 :: PASO 2: Detectar si es primer backup o diferencial
 set TIPO_BACKUP=FULL
-if exist "%BASE%\last_full_backup.txt" (
-  for /f "tokens=1,2 delims= " %%L in (%BASE%\last_full_backup.txt) do (
+if exist "%LASTBACKUP_FILE%" (
+  for /f "tokens=1,2 delims= " %%L in (%LASTBACKUP_FILE%) do (
     set ULTIMA_FECHA=%%L
     set ULTIMA_HORA=%%M
   )
   set TIPO_BACKUP=DIFERENCIAL
-  echo [%DATE% %TIME%] Backup diferencial - Ultima fecha/hora: %ULTIMA_FECHA% %ULTIMA_HORA%>>"%LOG%"
+  echo [%DATE% %TIME%] Backup diferencial - Última fecha/hora: %ULTIMA_FECHA% %ULTIMA_HORA%>>"%LOG%"
   echo.
   echo === BACKUP DIFERENCIAL ===
-  echo Ultimos cambios desde: %ULTIMA_FECHA% %ULTIMA_HORA%
+  echo Últimos cambios desde: %ULTIMA_FECHA% %ULTIMA_HORA%
   echo.
 ) else (
   echo [%DATE% %TIME%] Primer backup - COMPLETO>>"%LOG%"
   echo.
-  echo === BACKUP COMPLETO (FULL) ===
+  echo === BACKUP COMPLETO FULL ===
   echo.
 )
 
@@ -67,7 +73,7 @@ if "%TIPO_BACKUP%"=="DIFERENCIAL" (
     )
   )
   set OPCIONES_DIFF=%OPCIONES% /MAXAGE:%FECHA_ROBOCOPY%
-  echo [%DATE% %TIME%] Copiando solo archivos mas nuevos que: %ULTIMA_FECHA% %ULTIMA_HORA%>>"%LOG%"
+  echo [%DATE% %TIME%] Copiando solo archivos más nuevos que: %ULTIMA_FECHA% %ULTIMA_HORA%>>"%LOG%"
 )
 
 robocopy "\\%HOST%\%SHARE%" "%TMP%" %OPCIONES_DIFF% /LOG+:"%LOG%"
@@ -91,17 +97,57 @@ set ZIP=%BASE%\%FECHA%_v%V%_%HOST%_%SHARE%.zip
 
 rmdir /s /q "%TMP%"
 
-echo [%DATE% %TIME%] BACKUP OK - TIPO: %TIPO_BACKUP% - %SHARE% -> %ZIP%>>"%LOG%"
+:: ESTADÍSTICAS: Capturar hora de fin
+set HORA_FIN=%TIME%
+
+:: Obtener tamaño del ZIP
+for %%F in ("%ZIP%") do set TAMANIO_ZIP=%%~zF
+if %TAMANIO_ZIP% GEQ 1048576 (
+  set /a TAMANIO_MB=%TAMANIO_ZIP% / 1048576
+  set TAMANIO_FORMATO=%TAMANIO_MB% MB
+) else if %TAMANIO_ZIP% GEQ 1024 (
+  set /a TAMANIO_KB=%TAMANIO_ZIP% / 1024
+  set TAMANIO_FORMATO=%TAMANIO_KB% KB
+) else (
+  set TAMANIO_FORMATO=%TAMANIO_ZIP% bytes
+)
+
+:: Guardar estadísticas en LOG
+echo.>>"%LOG%"
+echo === ESTADÍSTICAS DE BACKUP ===>>"%LOG%"
+echo Hora inicio: %HORA_INICIO%>>"%LOG%"
+echo Hora fin: %HORA_FIN%>>"%LOG%"
+echo Tipo: %TIPO_BACKUP%>>"%LOG%"
+echo Tamaño ZIP: %TAMANIO_FORMATO%>>"%LOG%"
+echo Archivo: %ZIP%>>"%LOG%"
+echo.>>"%LOG%"
+
+echo [%DATE% %TIME%] BACKUP OK - TIPO: %TIPO_BACKUP% - TAMAÑO: %TAMANIO_FORMATO% - %SHARE% -> %ZIP%>>"%LOG%"
 
 echo.
-echo ============================================
-echo BACKUP COMPLETADO - TIPO: %TIPO_BACKUP%
-echo Recurso: %SHARE%
-echo Archivo: %ZIP%
-echo ============================================
+echo ╔════════════════════════════════════════════════╗
+echo ║        BACKUP COMPLETADO EXITOSAMENTE          ║
+echo ╚════════════════════════════════════════════════╝
+echo.
+echo [HOST]      %HOST%
+echo [RECURSO]   %SHARE%
+echo [TIPO]      %TIPO_BACKUP%
+echo [TAMAÑO]    %TAMANIO_FORMATO%
+echo [INICIO]    %HORA_INICIO%
+echo [FIN]       %HORA_FIN%
+echo.
+echo [ARCHIVO]   %ZIP%
+echo.
+echo ┌────────────────────────────────────────────────┐
+echo │ %ZIP%
+echo └────────────────────────────────────────────────┘
+echo.
+echo [LOG] %LOG%
 echo.
 
-:: Guardar fecha y hora de este backup para futuras diferenciales
-echo %FECHA_COMPLETA% > "%BASE%\last_full_backup.txt"
+:: Guardar fecha y hora de este backup para futuras diferenciales (archivo único por SHARE)
+echo %FECHA_COMPLETA% > "%LASTBACKUP_FILE%"
+
+call send_mail.bat "%HOST%" "%SHARE%" "%TIPO_BACKUP%" "%TAMANIO_FORMATO%" "%ZIP%" "%HORA_INICIO%" "%HORA_FIN%"
 
 exit /b

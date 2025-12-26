@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 call config.bat
 
 for /f "tokens=1,2,3 delims=|" %%A in (hosts.txt) do (

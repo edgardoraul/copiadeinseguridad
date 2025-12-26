@@ -1,30 +1,45 @@
-@REM @echo off
-@REM set HOST=%~1
-@REM set LOG=%~2
-@REM set MAILLOG=%~3
+@echo off
+chcp 65001 >nul
+call config.bat
 
-@REM "%BLAT%" "%LOG%" ^
-@REM  -to "%MAIL_TO%" ^
-@REM  -f "%MAIL_FROM%" ^
-@REM  -server "%SMTP_SERVER%" ^
-@REM  -port %SMTP_PORT% ^
-@REM  -subject "Backup %HOST% - %DATE%" >> "%MAILLOG%" 2>&1
+:: Recibir parámetros del script caller
+set HOST=%1
+set SHARE=%2
+set TIPO_BACKUP=%3
+set TAMANIO_FORMATO=%4
+set ZIP=%5
+set HORA_INICIO=%6
+set HORA_FIN=%7
 
-@REM if errorlevel 1 (
-@REM     echo [%DATE% %TIME%] ERROR: No se pudo enviar email >> "%LOG%"
-@REM ) else (
-@REM     echo [%DATE% %TIME%] Email enviado correctamente >> "%LOG%"
-@REM )
+:: Crear archivo temporal con contenido del email
+set TEMP_EMAIL=%TEMP%\backup_email_%RANDOM%.txt
 
-@REM exit /b 0
+:: Escribir resumen en el archivo temporal
+(
+  echo === RESUMEN DE BACKUP ===
+  echo.
+  echo Host:       %HOST%
+  echo Recurso:    %SHARE%
+  echo Tipo:       %TIPO_BACKUP%
+  echo Tamaño:     %TAMANIO_FORMATO%
+  echo Estado:     EXITOSO
+  echo Inicio:     %HORA_INICIO%
+  echo Fin:        %HORA_FIN%
+  echo.
+  echo Archivo:    %ZIP%
+) > "%TEMP_EMAIL%"
 
-echo Prueba directa | D:\Archivos de Programa\copiadeinseguridad\blat.exe ^
--to "edgardorerdamza@hotmail.com" ^
--server "mail.rerda.com" ^
--port 465 ^
--u "admin@rerda.com" ^
--p "Mprerda2026." ^
--f "admin@rerda.com" ^
--subject "Prueba BLAT SSL" ^
--ssl
-echo "Chau·"
+:: Enviar email con BLAT
+:: "%BLAT%" "%TEMP_EMAIL%" -to "%MAIL_TO%" -f "%MAIL_FROM%" -server "%SMTP_SERVER%" -port %SMTP_PORT% -u "%MAIL_USER%" -pw "%MAIL_PASS%" -subject "Backup %HOST% - %SHARE% - %TIPO_BACKUP%"
+
+"SwithMail.exe" /s /from "%MAIL_FROM%" /name "Backup System" /server "%SMTP_SERVER%" /p "%SMTP_PORT%" /SSL /u "%MAIL_USER%" /pass "%MAIL_PASS%" /to "%MAIL_TO%" /sub "Backup %HOST% - %SHARE% - %TIPO_BACKUP%" /bodytxt "%TEMP_EMAIL%"
+
+if errorlevel 1 (
+  echo [%DATE% %TIME%] ERROR: No se pudo enviar email
+  del "%TEMP_EMAIL%"
+  exit /b 1
+) else (
+  echo [%DATE% %TIME%] Email enviado correctamente
+  del "%TEMP_EMAIL%"
+  exit /b 0
+)
