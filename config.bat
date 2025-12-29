@@ -1,6 +1,9 @@
 @echo off
 chcp 65001 >nul
 
+:: Contador para incrementar
+set CONTADOR=0
+
 :: Utilidad de compresión (tar nativo de Windows 10+)
 set TAR=bsdtar.exe
 

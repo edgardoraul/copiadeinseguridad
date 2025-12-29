@@ -1,5 +1,5 @@
 @echo off
-chcp 65001 >nul
+chcp 65001 > nul
 call config.bat
 
 :: Recibir parámetros del script caller
@@ -29,10 +29,8 @@ set TEMP_EMAIL=%TEMP%\backup_email_%RANDOM%.txt
   echo Archivo:    %ZIP%
 ) > "%TEMP_EMAIL%"
 
-:: Enviar email con BLAT
-:: "%BLAT%" "%TEMP_EMAIL%" -to "%MAIL_TO%" -f "%MAIL_FROM%" -server "%SMTP_SERVER%" -port %SMTP_PORT% -u "%MAIL_USER%" -pw "%MAIL_PASS%" -subject "Backup %HOST% - %SHARE% - %TIPO_BACKUP%"
-
-"SwithMail.exe" /s /from "%MAIL_FROM%" /name "Backup System" /server "%SMTP_SERVER%" /p "%SMTP_PORT%" /SSL /u "%MAIL_USER%" /pass "%MAIL_PASS%" /to "%MAIL_TO%" /sub "Backup %HOST% - %SHARE% - %TIPO_BACKUP%" /bodytxt "%TEMP_EMAIL%"
+:: Enviar email con SwithMail
+"SwithMail.exe" /s /from "%MAIL_FROM%" /name "Backup System" /server "%SMTP_SERVER%" /p "%SMTP_PORT%" /SSL /u "%MAIL_USER%" /pass "%MAIL_PASS%" /to "%MAIL_TO%" /sub "Backup %HOST% - %SHARE% - %TIPO_BACKUP%" /bodytxt "%TEMP_EMAIL%" /encoding "utf-8"
 
 if errorlevel 1 (
   echo [%DATE% %TIME%] ERROR: No se pudo enviar email
