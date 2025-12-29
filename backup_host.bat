@@ -1,4 +1,4 @@
-@echo off
+echo off
 chcp 65001 >nul
 :: Host a copiar
 set HOST=%1

@@ -1,4 +1,4 @@
-@echo off
+echo off
 chcp 65001 >nul
 
 :: Contador para incrementar
@@ -11,4 +11,4 @@ set TAR=bsdtar.exe
 set OPCIONES=/E /Z /R:2 /W:2 /XJ /COPY:DAT /XF "NTUSER*" "desktop.ini" /XD "AppData"
 
 :: Email envío con.... ¿qué carajos te importa, pelotudo?
-call ..\datos.bat
+call datos.bat
