@@ -3,11 +3,8 @@ MENDOZA|Usuario|D:
 PC12|Escritorio|D:
 PC12|Documentos|D:
 
-DEPOSITO|h|D:
-DEPOSITO|Mis Documentos|D:
-
-FACTURACION1|usuario|D:
-FACTURACION1|Programas Util|D:
+IRENE|Documentos|D:
+IRENE|Escritorio|D:
 
 PC3|Documentos|D:
 PC3|Escritorio|D:
@@ -18,26 +15,29 @@ PC4|Mis Documentos|D:
 PC12|Escritorio|D:
 PC12|Documentos|D:
 
+PC15|Escritorio|D:
+PC15|Documentos|D:
+
 LENOVOG580|Escritorio|D:
 LENOVOG580|Documentos|D:
+
+FACTURACION1|usuario|D:
+FACTURACION1|Programas Util|D:
+
+DEPOSITO|h|D:
+DEPOSITO|Mis Documentos|D:
+
+ELE|Usuario|D:
 
 VALERIA-MORALES|Escritorio|D:
 VALERIA-MORALES|valeria|D:
 VALERIA-MORALES|imp compartidos|D:
 VALERIA-MORALES|Mis Documentos|D:
 
-PC15|Escritorio|D:
-PC15|Documentos|D:
-
 LUCAS|ARMADO|D:
 LUCAS|Desktop|D:
 LUCAS|e|D:
 LUCAS|g|D:
-
-IRENE|Documentos|D:
-IRENE|Escritorio|D:
-
-ELE|Usuario|D:
 
 EDGAR|Escritorio|E:
 EDGAR|Documentos|E:

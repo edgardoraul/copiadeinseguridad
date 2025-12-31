@@ -112,6 +112,18 @@ if %TAMANIO_ZIP% GEQ 1048576 (
   set TAMANIO_FORMATO=%TAMANIO_ZIP% bytes
 )
 
+:: Cuenta caracteres
+set "temp_str=%ZIP%"
+set contador=0
+:loop
+if defined temp_str (
+    set "temp_str=%temp_str:~1%"
+    set /a contador+=1
+    goto loop
+)
+
+
+
 :: Guardar estadísticas en LOG
 echo.>>"%LOG%"
 echo === ESTADÍSTICAS DE BACKUP ===>>"%LOG%"
@@ -138,9 +150,14 @@ echo [FIN]       %HORA_FIN%
 echo.
 echo [ARCHIVO]   %ZIP%
 echo.
-echo ┌────────────────────────────────────────────────┐
-echo │ %ZIP%
-echo └────────────────────────────────────────────────┘
+:: Dibujo de la caja corregido
+set /p ".=┌─" < nul
+for /l %%i in (1,1,%contador%) do <nul set /p ".=─"
+echo ─┐
+echo │ %ZIP% ^│
+set /p ".=└─" < nul
+for /l %%i in (1,1,%contador%) do <nul set /p ".=─"
+echo ─┘
 echo.
 echo [LOG] %LOG%
 echo.
