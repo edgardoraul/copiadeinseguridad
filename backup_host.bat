@@ -1,13 +1,7 @@
-echo off
-chcp 65001 >nul
-:: Host a copiar
-set HOST=%1
 
-:: Su carpeta o recurso compartido
-set SHARE=%2
-
-:: Disco donde se guardará la copia
-set DISCO=%~3
+set "HOST=%~1"
+set "SHARE=%~2"
+set "DISCO=%~3"
 
 :: Fecha actual, disco base, carpeta temporal y log
 set FECHA=%DATE:~6,4%-%DATE:~3,2%-%DATE:~0,2%
@@ -16,8 +10,8 @@ set HORA=%TIME:~0,2%:%TIME:~3,2%
 set FECHA_COMPLETA=%FECHA% %HORA%
 set HORA_INICIO=%TIME%
 set BASE=%DISCO%\Backup\%HOST%
-set TMP=%BASE%\%SHARE%
-set LOG=%BASE%\%HOST%.log
+set "TMP=%BASE%\%SHARE%"
+set "LOG=%BASE%\%HOST%.log"
 
 :: Controla si existe la carpeta base
 if not exist "%BASE%" mkdir "%BASE%"
@@ -29,34 +23,35 @@ set LASTBACKUP_FILE=%BASE%\.last_full_backup_%SHARE_SAFE%.txt
 :: PASO 2: Detectar si es primer backup o diferencial
 set TIPO_BACKUP=FULL
 if exist "%LASTBACKUP_FILE%" (
-  for /f "tokens=1,2 delims= " %%L in (%LASTBACKUP_FILE%) do (
-    set ULTIMA_FECHA=%%L
-    set ULTIMA_HORA=%%M
-  )
-  set TIPO_BACKUP=DIFERENCIAL
-  echo [%DATE% %TIME%] Backup diferencial - Última fecha/hora: %ULTIMA_FECHA% %ULTIMA_HORA%>>"%LOG%"
-  echo.
-  echo === BACKUP DIFERENCIAL ===
-  echo Últimos cambios desde: %ULTIMA_FECHA% %ULTIMA_HORA%
-  echo.
+	for /f "tokens=1,2 delims= " %%L in (%LASTBACKUP_FILE%) do (
+		set ULTIMA_FECHA=%%L
+		set ULTIMA_HORA=%%M
+	)
+	set TIPO_BACKUP=DIFERENCIAL
+	echo [%DATE% %TIME%] Backup diferencial - Última fecha/hora: %ULTIMA_FECHA% %ULTIMA_HORA%>>"%LOG%"
+	echo.
+	echo === BACKUP DIFERENCIAL ===
+	echo Últimos cambios desde: %ULTIMA_FECHA% %ULTIMA_HORA%
+	echo.
 ) else (
-  echo [%DATE% %TIME%] Primer backup - COMPLETO>>"%LOG%"
-  echo.
-  echo === BACKUP COMPLETO FULL ===
-  echo.
+	echo [%DATE% %TIME%] Primer backup - COMPLETO>>"%LOG%"
+	echo.
+	echo === BACKUP COMPLETO FULL ===
+	echo.
 )
 
 :: Controla si el host está encendido
-call check_host.bat %HOST%
+:: call check_host.bat %HOST%
+ping -n 1 -w 1000 %1 >nul
 if errorlevel 1 (
-  echo [%DATE% %TIME%] HOST APAGADO>>"%LOG%"
-  exit /b
+	echo [%DATE% %TIME%] HOST APAGADO>>"%LOG%"
+	exit /b
 )
 
 :: Controla si el recurso compartido está disponible
 if not exist "\\%HOST%\%SHARE%" (
-  echo [%DATE% %TIME%] SHARE NO DISPONIBLE \\%HOST%\%SHARE%>>"%LOG%"
-  exit /b
+	echo [%DATE% %TIME%] RECURSO COMPARTIDO NO DISPONIBLE \\%HOST%\%SHARE%>>"%LOG%"
+	exit /b
 )
 
 :: Copia temporal CON PROGRESO EN TIEMPO REAL
@@ -65,25 +60,25 @@ mkdir "%TMP%" >nul 2>&1
 :: PASO 3: Si es diferencial, agregar /MAXAGE para copiar solo cambios
 set OPCIONES_DIFF=%OPCIONES%
 if "%TIPO_BACKUP%"=="DIFERENCIAL" (
-  for /f "tokens=1 delims=-" %%A in ("%ULTIMA_FECHA%") do (
-    for /f "tokens=2 delims=-" %%B in ("%ULTIMA_FECHA%") do (
-      for /f "tokens=3 delims=-" %%C in ("%ULTIMA_FECHA%") do (
-        set FECHA_ROBOCOPY=%%A%%B%%C
-      )
-    )
-  )
-  set OPCIONES_DIFF=%OPCIONES% /MAXAGE:%FECHA_ROBOCOPY%
-  echo [%DATE% %TIME%] Copiando solo archivos más nuevos que: %ULTIMA_FECHA% %ULTIMA_HORA%>>"%LOG%"
+	for /f "tokens=1 delims=-" %%A in ("%ULTIMA_FECHA%") do (
+		for /f "tokens=2 delims=-" %%B in ("%ULTIMA_FECHA%") do (
+			for /f "tokens=3 delims=-" %%C in ("%ULTIMA_FECHA%") do (
+				set FECHA_ROBOCOPY=%%A%%B%%C
+			)
+		)
+	)
+	set OPCIONES_DIFF=%OPCIONES% /MAXAGE:%FECHA_ROBOCOPY%
+	echo [%DATE% %TIME%] Copiando solo archivos más nuevos que: %ULTIMA_FECHA% %ULTIMA_HORA%>>"%LOG%"
 )
 
-robocopy "\\%HOST%\%SHARE%" "%TMP%" %OPCIONES_DIFF% /LOG+:"%LOG%"
+robocopy "\\%HOST%\%SHARE%" "%TMP%" %OPCIONES_DIFF% /NFL /NDL /NP /LOG+:"%LOG%"
 set RC=%ERRORLEVEL%
 
 
 if %RC% GEQ 8 (
-  echo [%DATE% %TIME%] ERROR ROBOCOPY RC=%RC%>>"%LOG%"
-  rmdir /s /q "%TMP%"
-  exit /b
+	echo [%DATE% %TIME%] ERROR ROBOCOPY RC=%RC%>>"%LOG%"
+	rmdir /s /q "%TMP%"
+	exit /b
 )
 
 :: Calcular versión
@@ -102,14 +97,21 @@ set HORA_FIN=%TIME%
 
 :: Obtener tamaño del ZIP
 for %%F in ("%ZIP%") do set TAMANIO_ZIP=%%~zF
-if %TAMANIO_ZIP% GEQ 1048576 (
-  set /a TAMANIO_MB=%TAMANIO_ZIP% / 1048576
-  set TAMANIO_FORMATO=%TAMANIO_MB% MB
-) else if %TAMANIO_ZIP% GEQ 1024 (
-  set /a TAMANIO_KB=%TAMANIO_ZIP% / 1024
-  set TAMANIO_FORMATO=%TAMANIO_KB% KB
+
+if not defined TAMANIO_ZIP (
+		set TAMANIO_FORMATO=0 bytes
 ) else (
-  set TAMANIO_FORMATO=%TAMANIO_ZIP% bytes
+		if !TAMANIO_ZIP! GEQ 1048576 (
+				set /a TAMANIO_MB=!TAMANIO_ZIP! / 1048576
+				set TAMANIO_FORMATO=!TAMANIO_MB! MB
+		) else (
+				if !TAMANIO_ZIP! GEQ 1024 (
+						set /a TAMANIO_KB=!TAMANIO_ZIP! / 1024
+						set TAMANIO_FORMATO=!TAMANIO_KB! KB
+				) else (
+						set TAMANIO_FORMATO=!TAMANIO_ZIP! bytes
+				)
+		)
 )
 
 :: Cuenta caracteres
@@ -117,9 +119,9 @@ set "temp_str=%ZIP%"
 set contador=0
 :loop
 if defined temp_str (
-    set "temp_str=%temp_str:~1%"
-    set /a contador+=1
-    goto loop
+		set "temp_str=%temp_str:~1%"
+		set /a contador+=1
+		goto loop
 )
 
 
@@ -153,11 +155,11 @@ echo.
 :: Dibujo de la caja corregido
 set /p ".=┌─" < nul
 for /l %%i in (1,1,%contador%) do <nul set /p ".=─"
-echo ─┐
-echo │ %ZIP% ^│
+echo ^─^┐
+echo ^│ %ZIP% ^│
 set /p ".=└─" < nul
 for /l %%i in (1,1,%contador%) do <nul set /p ".=─"
-echo ─┘
+echo ^─^┘
 echo.
 echo [LOG] %LOG%
 echo.

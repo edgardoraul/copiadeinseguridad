@@ -3,14 +3,18 @@ MENDOZA|Usuario|D:
 PC12|Escritorio|D:
 PC12|Documentos|D:
 
+FACTURACION1|usuario|D:
+FACTURACION1|Programas Util|D:
+
+PC4|Escritorio|D:
+PC4|Mis Documentos|D:
+
+
 IRENE|Documentos|D:
 IRENE|Escritorio|D:
 
 PC3|Documentos|D:
 PC3|Escritorio|D:
-
-PC4|Escritorio|D:
-PC4|Mis Documentos|D:
 
 PC12|Escritorio|D:
 PC12|Documentos|D:
@@ -20,9 +24,6 @@ PC15|Documentos|D:
 
 LENOVOG580|Escritorio|D:
 LENOVOG580|Documentos|D:
-
-FACTURACION1|usuario|D:
-FACTURACION1|Programas Util|D:
 
 DEPOSITO|h|D:
 DEPOSITO|Mis Documentos|D:
