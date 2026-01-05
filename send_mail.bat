@@ -1,4 +1,4 @@
-@echo off
+echo off
 :: Recibir parámetros del script caller
 set HOST=%1
 set SHARE=%2
@@ -19,7 +19,7 @@ set TEMP_EMAIL=%TEMP%\backup_email_%RANDOM%.txt
   echo Host:       %HOST%
   echo Recurso:    %SHARE%
   echo Tipo:       %TIPO_BACKUP%
-  echo Tamaño áéíóúäëïöü ñÑ:     %TAMANIO_FORMATO%
+  echo Peso:       %TAMANIO_FORMATO%
   echo Estado:     EXITOSO
   echo Inicio:     %HORA_INICIO%
   echo Fin:        %HORA_FIN%
@@ -27,7 +27,7 @@ set TEMP_EMAIL=%TEMP%\backup_email_%RANDOM%.txt
   echo Archivo:    %ZIP%
 ) > "%TEMP_EMAIL%"
 
-set TEMP_EMAIL=%LOG%
+::set TEMP_EMAIL=%LOG%
 
 :: Enviar email con SwithMail
 "SwithMail.exe" /s /from "%MAIL_FROM%" /name "Sistema Backup Rerda" /server "%SMTP_SERVER%" /p "%SMTP_PORT%" /SSL /u "%MAIL_USER%" /pass "%MAIL_PASS%" /to "%MAIL_TO%" /sub "Backup %HOST% - %SHARE% - %TIPO_BACKUP%" /bodytxt "%TEMP_EMAIL%" /Log /enc "utf-8"

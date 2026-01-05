@@ -1,7 +1,9 @@
+echo off
 
 set "HOST=%~1"
 set "SHARE=%~2"
 set "DISCO=%~3"
+set "NombreZip=%~4"
 
 :: Fecha actual, disco base, carpeta temporal y log
 set FECHA=%DATE:~6,4%-%DATE:~3,2%-%DATE:~0,2%
@@ -41,7 +43,6 @@ if exist "%LASTBACKUP_FILE%" (
 )
 
 :: Controla si el host está encendido
-:: call check_host.bat %HOST%
 ping -n 1 -w 1000 %1 >nul
 if errorlevel 1 (
 	echo [%DATE% %TIME%] HOST APAGADO>>"%LOG%"
@@ -85,6 +86,7 @@ if %RC% GEQ 8 (
 set V=1
 for %%F in ("%BASE%\%FECHA%_v*_%HOST%_%SHARE%.zip") do set /a V+=1
 
+set NombreZip=%FECHA%_v%V%_%HOST%_%SHARE%.zip
 set ZIP=%BASE%\%FECHA%_v%V%_%HOST%_%SHARE%.zip
 
 :: Compresión zip con BSDtar
@@ -115,24 +117,24 @@ if not defined TAMANIO_ZIP (
 )
 
 :: Cuenta caracteres
-set "temp_str=%ZIP%"
+set "temp_str=%NombreZip%"
 set contador=0
 :loop
 if defined temp_str (
-		set "temp_str=%temp_str:~1%"
-		set /a contador+=1
-		goto loop
+	set "temp_str=%temp_str:~1%"
+	set /a contador+=1
+	goto loop
 )
 
 
 
 :: Guardar estadísticas en LOG
 echo.>>"%LOG%"
-echo === ESTADÍSTICAS DE BACKUP ===>>"%LOG%"
+echo === ESTADISTICAS DE BACKUP ===>>"%LOG%"
 echo Hora inicio: %HORA_INICIO%>>"%LOG%"
 echo Hora fin: %HORA_FIN%>>"%LOG%"
 echo Tipo: %TIPO_BACKUP%>>"%LOG%"
-echo Tamaño ZIP: %TAMANIO_FORMATO%>>"%LOG%"
+echo Peso Archivo ZIP: %TAMANIO_FORMATO%>>"%LOG%"
 echo Archivo: %ZIP%>>"%LOG%"
 echo.>>"%LOG%"
 
@@ -146,10 +148,9 @@ echo.
 echo [HOST]      %HOST%
 echo [RECURSO]   %SHARE%
 echo [TIPO]      %TIPO_BACKUP%
-echo [TAMAÑO]    %TAMANIO_FORMATO%
+echo [PESO]    %TAMANIO_FORMATO%
 echo [INICIO]    %HORA_INICIO%
 echo [FIN]       %HORA_FIN%
-echo.
 echo [ARCHIVO]   %ZIP%
 echo.
 :: Dibujo de la caja corregido
@@ -167,6 +168,18 @@ echo.
 :: Guardar fecha y hora de este backup para futuras diferenciales (archivo único por SHARE)
 echo %FECHA_COMPLETA% > "%LASTBACKUP_FILE%"
 
+:: Enviar email de notificación
 call send_mail.bat "%HOST%" "%SHARE%" "%TIPO_BACKUP%" "%TAMANIO_FORMATO%" "%ZIP%" "%HORA_INICIO%" "%HORA_FIN%"
 
+:: Guardar resultado en la PC EDGAR
+set "TAB=	"
+set "RUTA=\\EDGAR\Escritorio\resumen_backups.txt"
+
+:: Crea el encabezado si el archivo no existe
+if not exist "%RUTA%" (
+    echo HOST%TAB%ARCHIVO ZIP%TAB%TAMAÑO%TAB%TIPO BACKUP%TAB%ULTIMO BK FULL%TAB%HORA INICIO%TAB%HORA FIN> "%RUTA%"
+)
+
+:: Agrega la línea de datos
+echo %HOST%%TAB%%NombreZip%%TAB%%TAMANIO_FORMATO%%TAB%%TIPO_BACKUP%%TAB%%FECHA_COMPLETA%%TAB%%HORA_INICIO%%TAB%%HORA_FIN%>> "%RUTA%"
 exit /b

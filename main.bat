@@ -1,5 +1,4 @@
-@echo off
-cd /d %~dp0
+echo off
 chcp 850 >nul
 setlocal EnableDelayedExpansion
 
@@ -16,7 +15,5 @@ set OPCIONES=/E /Z /R:2 /W:2 /XJ /COPY:DAT /XF "NTUSER*" "desktop.ini" /XD "AppD
 call ../datos.bat
 
 for /f "tokens=1,2,3 delims=|" %%A in (hosts.txt) do (
-
   call backup_host.bat "%%A" "%%B" "%%C"
-
 )
