@@ -4,20 +4,15 @@ PC12|Escritorio|D:
 PC12|Documentos|D:
 
 FACTURACION1|usuario|D:
-FACTURACION1|Programas Util|D:
 
 PC4|Escritorio|D:
 PC4|Mis Documentos|D:
-
 
 IRENE|Documentos|D:
 IRENE|Escritorio|D:
 
 PC3|Documentos|D:
 PC3|Escritorio|D:
-
-PC12|Escritorio|D:
-PC12|Documentos|D:
 
 PC15|Escritorio|D:
 PC15|Documentos|D:
@@ -35,14 +30,14 @@ VALERIA-MORALES|valeria|D:
 VALERIA-MORALES|imp compartidos|D:
 VALERIA-MORALES|Mis Documentos|D:
 
+EDGAR|Escritorio|E:
+EDGAR|Documentos|E:
+EDGAR|Web|E:
+
 LUCAS|ARMADO|D:
 LUCAS|Desktop|D:
 LUCAS|e|D:
 LUCAS|g|D:
-
-EDGAR|Escritorio|E:
-EDGAR|Documentos|E:
-EDGAR|Web|E:
 
 MARCOS|marco|E:
 MARCOS|Nubia|E:
@@ -55,3 +50,6 @@ FABRICIO|Documentos|E:
 FABRICIO|Escritorio|E:
 
 RAUL-MARCELO|usuario|E:
+
+SER-DF|ZlBackUps|E:
+SER-DF|D|E:

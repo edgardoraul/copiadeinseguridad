@@ -4,6 +4,7 @@ set "HOST=%~1"
 set "SHARE=%~2"
 set "DISCO=%~3"
 set "NombreZip=%~4"
+set "FECHA_HOY=%DATE:~6,4%-%DATE:~3,2%-%DATE:~0,2%"
 
 :: Fecha actual, disco base, carpeta temporal y log
 set FECHA=%DATE:~6,4%-%DATE:~3,2%-%DATE:~0,2%
@@ -28,6 +29,13 @@ if exist "%LASTBACKUP_FILE%" (
 	for /f "tokens=1,2 delims= " %%L in (%LASTBACKUP_FILE%) do (
 		set ULTIMA_FECHA=%%L
 		set ULTIMA_HORA=%%M
+
+		:: Controla si ya se hizo un backup hoy
+		if "%ULTIMA_FECHA%"=="%FECHA%" (
+			echo [%DATE% %TIME%] Ya se realizó un backup FULL hoy. No se permiten múltiples backups FULL en el mismo día.>>"%LOG%"
+			echo [%DATE% %TIME%] Hoy ya se realizó un backup de: %HOST% - %SHARE%
+			exit /b
+		)
 	)
 	set TIPO_BACKUP=DIFERENCIAL
 	echo [%DATE% %TIME%] Backup diferencial - Última fecha/hora: %ULTIMA_FECHA% %ULTIMA_HORA%>>"%LOG%"
@@ -157,7 +165,7 @@ echo.
 set /p ".=┌─" < nul
 for /l %%i in (1,1,%contador%) do <nul set /p ".=─"
 echo ^─^┐
-echo ^│ %ZIP% ^│
+echo ^│ %NombreZip% ^│
 set /p ".=└─" < nul
 for /l %%i in (1,1,%contador%) do <nul set /p ".=─"
 echo ^─^┘
