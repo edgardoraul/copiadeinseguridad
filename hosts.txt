@@ -23,6 +23,9 @@ LENOVOG580|Documentos|D:
 DEPOSITO|h|D:
 DEPOSITO|Mis Documentos|D:
 
+PC5|Documentos|D:
+PC5|Escritorio|D:
+
 ELE|Usuario|D:
 
 VALERIA-MORALES|Escritorio|D:
