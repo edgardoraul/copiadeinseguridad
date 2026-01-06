@@ -31,7 +31,7 @@ if exist "%LASTBACKUP_FILE%" (
 		set ULTIMA_HORA=%%M
 
 		:: Controla si ya se hizo un backup hoy
-		if "%ULTIMA_FECHA%"=="%FECHA%" (
+		if "%ULTIMA_FECHA%"=="%FECHA_HOY%" (
 			echo [%DATE% %TIME%] Ya se realizó un backup FULL hoy. No se permiten múltiples backups FULL en el mismo día.>>"%LOG%"
 			echo [%DATE% %TIME%] Hoy ya se realizó un backup de: %HOST% - %SHARE%
 			exit /b
