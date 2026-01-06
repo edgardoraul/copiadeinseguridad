@@ -79,7 +79,7 @@ if "%TIPO_BACKUP%"=="DIFERENCIAL" (
 	set OPCIONES_DIFF=%OPCIONES% /MAXAGE:%FECHA_ROBOCOPY%
 	echo [%DATE% %TIME%] Copiando solo archivos más nuevos que: %ULTIMA_FECHA% %ULTIMA_HORA%>>"%LOG%"
 )
-
+echo Backupeando "\\%HOST%\%SHARE%" ...
 robocopy "\\%HOST%\%SHARE%" "%TMP%" %OPCIONES_DIFF% /NFL /NDL /NP /LOG+:"%LOG%"
 set RC=%ERRORLEVEL%
 
@@ -181,7 +181,7 @@ call send_mail.bat "%HOST%" "%SHARE%" "%TIPO_BACKUP%" "%TAMANIO_FORMATO%" "%ZIP%
 
 :: Guardar resultado en la PC EDGAR
 set "TAB=	"
-set "RUTA=\\EDGAR\Escritorio\resumen_backups.txt"
+set "RUTA=\\EDGAR\Escritorio\resumen_backups.csv"
 
 :: Crea el encabezado si el archivo no existe
 if not exist "%RUTA%" (
