@@ -16,18 +16,18 @@ set TEMP_EMAIL=%TEMP%\backup_email_%RANDOM%.txt
 (
 	echo === RESUMEN DE BACKUP ===
 	echo.
-	echo Host:		%HOST%
-	echo Recurso:	%SHARE%
-	echo Tipo:		%TIPO_BACKUP%
-	echo Peso:		%TAMANIO_FORMATO%
-	echo Estado:	EXITOSO
-	echo Inicio:	%HORA_INICIO%
-	echo Fin:		%HORA_FIN%
-	echo.
-	echo Archivo:	%ZIP%
+	echo Host:______ %HOST:"=%
+	echo Recurso:___ %SHARE:"=%
+	echo Tipo:______ %TIPO_BACKUP:"=%
+	echo Peso:______ %TAMANIO_FORMATO:"=%
+	echo Estado:____ EXITOSO
+	echo Inicio:____ %HORA_INICIO:"=%
+	echo Fin:_______ %HORA_FIN:"=%
+	echo Archivo:___ %ZIP:"=%
+
 ) > "%TEMP_EMAIL%"
 
-::set TEMP_EMAIL=%LOG%
+:: set TEMP_EMAIL=%LOG%
 
 :: Enviar email con SwithMail
 "SwithMail.exe" /s /from "%MAIL_FROM%" /name "Sistema Backup Rerda" /server "%SMTP_SERVER%" /p "%SMTP_PORT%" /SSL /u "%MAIL_USER%" /pass "%MAIL_PASS%" /to "%MAIL_TO%" /sub "Backup %HOST% - %SHARE% - %TIPO_BACKUP%" /bodytxt "%TEMP_EMAIL%" /Log /enc "utf-8"

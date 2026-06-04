@@ -1,0 +1,61 @@
+
+::
+:: Trabajo de Robocopy D:\ARCHIVOS DE PROGRAMA\COPIADEINSEGURIDAD\TRABAJO.TXT.RCJ
+::
+:: Creado por EDGARD el miércoles, 7 de enero de 2026 a las 16:36:18
+::
+
+::
+:: Directorio de origen:
+::
+	/SD:\\PC4\Mis Documentos\	:: Directorio de origen.
+
+::
+:: Directorio de destino:
+::
+	/DD:D:\Backup\PC4\Mis Documentos\	:: Directorio de destino.
+
+::
+:: Incluir estos archivos:
+::
+	/IF		:: Incluir archivos que coincidan con estos nombres
+::		*.*	:: Incluir todos los nombres (actualmente: la línea de comandos puede invalidar)
+	/XJ		:: excluir vínculos simbólicos (para archivos y directorios) y los puntos de unión.
+
+::
+:: Excluir estos directorios:
+::
+	/XD		:: Excluir directorios que coincidan con estos nombres
+		AppData
+
+::
+:: Excluir estos archivos:
+::
+	/XF		:: Excluir archivos que coincidan con estos nombres
+		desktop.ini
+		NTUSER*
+::
+:: Opciones de copia :
+::
+	/S		:: Copiar subdirectorios, pero no los vacíos.
+	/E		:: Copiar subdirectorios, incluidos los vacíos.
+	/DCOPY:D	:: qué copiar para los directorios (el valor predeterminado es /DCOPY:DA).
+	/COPY:DAT	:: qué copiar de los archivos (el valor predeterminado
+                       es /COPY:DAT).
+	/B		:: Copiar archivos en modo de copia de seguridad.
+::
+:: Opciones de reintento:
+::
+	/R:2		:: Número de reintentos en copias con errores; valor
+                       predeterminado: 1 millón.
+	/W:2		:: Tiempo de espera entre reintentos; valor
+                       predeterminado: 30 segundos.
+::
+:: Opciones de registro:
+::
+	/NDL		:: Sin lista de directorios, no registrar nombres de
+                       directorio.
+	/NFL		:: Sin lista de archivos, no registrar nombres de archivo.
+	/NP		:: Sin progreso, no mostrar porcentaje copiado.
+	/LOG+:D:\Backup\PC4\PC4.log	:: Incluir estado en archivo LOG (anexar a registro
+                       existente).

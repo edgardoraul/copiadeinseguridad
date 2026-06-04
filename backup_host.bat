@@ -29,14 +29,15 @@ if exist "%LASTBACKUP_FILE%" (
 	for /f "tokens=1,2 delims= " %%L in (%LASTBACKUP_FILE%) do (
 		set ULTIMA_FECHA=%%L
 		set ULTIMA_HORA=%%M
-
-		:: Controla si ya se hizo un backup hoy
-		if "%ULTIMA_FECHA%"=="%FECHA_HOY%" (
-			echo [%DATE% %TIME%] Ya se realizó un backup FULL hoy. No se permiten múltiples backups FULL en el mismo día.>>"%LOG%"
-			echo [%DATE% %TIME%] Hoy ya se realizó un backup de: %HOST% - %SHARE%
-			exit /b
-		)
 	)
+
+	:: Controla si ya se hizo un backup hoy
+	if "%ULTIMA_FECHA%"=="%FECHA_HOY%" (
+		echo [%DATE% %TIME%] Ya se realizó un backup FULL hoy. No se permiten múltiples backups FULL en el mismo día.>>"%LOG%"
+		echo [%DATE% %TIME%] Hoy ya se realizó un backup de: %HOST% - %SHARE%
+		exit /b
+	)
+
 	set TIPO_BACKUP=DIFERENCIAL
 	echo [%DATE% %TIME%] Backup diferencial - Última fecha/hora: %ULTIMA_FECHA% %ULTIMA_HORA%>>"%LOG%"
 	echo.
@@ -46,7 +47,7 @@ if exist "%LASTBACKUP_FILE%" (
 ) else (
 	echo [%DATE% %TIME%] Primer backup - COMPLETO>>"%LOG%"
 	echo.
-	echo === BACKUP COMPLETO FULL ===
+	echo === BACKUP COMPLETO ===
 	echo.
 )
 
@@ -59,7 +60,7 @@ if errorlevel 1 (
 
 :: Controla si el recurso compartido está disponible
 if not exist "\\%HOST%\%SHARE%" (
-	echo [%DATE% %TIME%] RECURSO COMPARTIDO NO DISPONIBLE \\%HOST%\%SHARE%>>"%LOG%"
+	echo [%DATE% %TIME%] RECURSO COMPARTIDO NO DISPONIBLE "\\%HOST%\%SHARE%">>"%LOG%"
 	exit /b
 )
 
@@ -80,7 +81,7 @@ if "%TIPO_BACKUP%"=="DIFERENCIAL" (
 	echo [%DATE% %TIME%] Copiando solo archivos más nuevos que: %ULTIMA_FECHA% %ULTIMA_HORA%>>"%LOG%"
 )
 echo Backupeando "\\%HOST%\%SHARE%" ...
-robocopy "\\%HOST%\%SHARE%" "%TMP%" %OPCIONES_DIFF% /NFL /NDL /NP /LOG+:"%LOG%"
+robocopy "\\%HOST%\%SHARE%" "%TMP%" %OPCIONES_DIFF% /LOG+:"%LOG%" /SAVE:trabajo.txt
 set RC=%ERRORLEVEL%
 
 
@@ -153,13 +154,13 @@ echo ╔════════════════════════
 echo ║        BACKUP COMPLETADO EXITOSAMENTE          ║
 echo ╚════════════════════════════════════════════════╝
 echo.
-echo [HOST]      %HOST%
-echo [RECURSO]   %SHARE%
-echo [TIPO]      %TIPO_BACKUP%
-echo [PESO]    %TAMANIO_FORMATO%
-echo [INICIO]    %HORA_INICIO%
-echo [FIN]       %HORA_FIN%
-echo [ARCHIVO]   %ZIP%
+echo [HOST]		%HOST%
+echo [RECURSO]	%SHARE%
+echo [TIPO]		%TIPO_BACKUP%
+echo [PESO]		%TAMANIO_FORMATO%
+echo [INICIO]	%HORA_INICIO%
+echo [FIN]		%HORA_FIN%
+echo [ARCHIVO]	%ZIP%
 echo.
 :: Dibujo de la caja corregido
 set /p ".=┌─" < nul
